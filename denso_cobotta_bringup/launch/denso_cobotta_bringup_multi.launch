@@ -1,0 +1,46 @@
+<launch>
+  <!-- "gripper type": Select from none/parallel/vacuum. -->
+  <arg name="gripper_type" default="parallel"/>
+  <arg name="robot_name" default="/left_arm"/>
+
+  <group ns="$(arg robot_name)">
+    <param name="gripper_type" value="$(arg gripper_type)"/>
+  </group>
+
+  <!-- "sim": Determine launching as simulation mode or not. -->
+  <arg name="sim" default="false" />
+
+  <!-- Include files for real robot. -->
+  <group unless="$(arg sim)">
+    <!-- Files for denso_cobotta_driver node. -->
+    <arg name="enable_calset" default="false" />
+    
+    <group ns="$(arg robot_name)">
+      <rosparam param="enable_calset" subst_value="true">$(arg enable_calset)</rosparam>
+
+      <rosparam ns="$(arg robot_name)" command="load" file="$(find denso_cobotta_driver)/config/parameters.yaml" />
+      <rosparam if="$(arg enable_calset)" ns="$(arg robot_name)" command="load" file="$(find denso_cobotta_moveit_config)/config/joint_limits.yaml"/>
+      <!-- node -->
+      <node name="denso_cobotta_driver" pkg="denso_cobotta_driver" type="denso_cobotta_driver" output="screen" required="true">
+        <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}]: ${node}: ${message}"/>
+      </node>
+    </group>
+
+    <!-- Files for denso_cobotta_control node. -->
+    <!-- Originally from the launch file -->
+    <!-- <include file="$(find denso_cobotta_control)/launch/denso_cobotta_control.launch"/> -->
+    <node name="denso_cobotta_control" pkg="denso_cobotta_control" type="denso_cobotta_control" output="screen" ns="$(arg robot_name)" required="true">
+      <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}]: ${node}: ${message}"/>
+    </node>
+    
+    <group ns="$(arg robot_name)">
+      <rosparam file="$(find denso_cobotta_descriptions)/cobotta_description/denso_cobotta_control_multi.yaml" command="load" />
+      <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller arm_controller" required="true"/>
+      
+      <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen" required="true">
+        <remap from="/joint_states" to="$(arg robot_name)/joint_states" />
+      </node>
+
+    </group> 
+  </group>
+</launch>
