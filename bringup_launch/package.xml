@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>cobotta_launch</name>
+  <name>bringup_launch</name>
   <version>1.0.0</version>
-  <description>The 'cobotta_launch' package coordinates the robot tasks and behaviors across all packages using shared launch files.</description>
+  <description>The 'bringup_launch' package coordinates the robot tasks and behaviors across all packages using shared launch files.</description>
 
   <maintainer email="puriguen@gmail.com">Pedro Uriguen</maintainer>
   <license>MIT</license>

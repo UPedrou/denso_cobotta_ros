@@ -1,0 +1,37 @@
+<launch>
+  <!-- robot name -->
+    <arg name="robot_name" value="robot_1" />
+    <arg name="gripper_type" default="parallel"/>
+
+
+        <!-- Driver -->
+        <arg name="enable_calset" default="false" />
+        <rosparam param="enable_calset" subst_value="true">$(arg enable_calset)</rosparam>
+        
+        <rosparam ns="$(arg robot_name)/cobotta" command="load" file="$(find denso_cobotta_driver)/config/parameters.yaml" />
+        <rosparam if="$(arg enable_calset)" ns="$(arg robot_name)" command="load" file="$(find denso_cobotta_moveit_config)/config/joint_limits.yaml"/>
+        <!-- node -->
+        <node name="denso_cobotta_driver" pkg="denso_cobotta_driver" type="denso_cobotta_driver" output="screen" required="true" ns="$(arg robot_name)/cobotta">
+            <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}]: ${node}: ${message}"/>
+        </node>
+
+        <node name="denso_cobotta_control" pkg="denso_cobotta_control" type="denso_cobotta_control" output="screen" required="true" ns="$(arg robot_name)/cobotta">
+            <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}]: ${node}: ${message}"/>
+        </node>
+    
+    <group ns="$(arg robot_name)" >
+        <!-- by default we do not overwrite the urdf. change the following to true to change the default behavior -->
+        <!-- load universal robot description format (urdf) -->
+        <param name="cobotta/robot_description" command="$(find xacro)/xacro --inorder $(find denso_cobotta_descriptions)/cobotta_description/cobotta.urdf.xacro gripper_type:=$(arg gripper_type) robot_description:=$(arg robot_name)/cobotta/robot_description robot_name:=$(arg robot_name)/cobotta"/>
+
+        <!-- load joint controller configurations to parameter server -->
+        <rosparam file="$(find denso_cobotta_descriptions)/cobotta_description/denso_cobotta_control.yaml" command="load" />
+        <!-- load the controllers -->
+        <node ns="cobotta" name="controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller arm_controller  --shutdown-timeout 3" respawn="false" output="screen"/>
+        <node ns="cobotta" name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen" required="true">
+            <remap from="/joint_states" to="joint_states" />
+        </node>
+
+    </group>
+
+</launch>

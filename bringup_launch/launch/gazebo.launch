@@ -14,7 +14,7 @@
 
   <!-- launch simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" default="$(find cobotta_launch)/worlds/lights.world"/>
+    <arg name="world_name" default="$(find bringup_launch)/worlds/lights.world"/>
     <arg name="paused" value="$(arg paused)"/>
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
     <arg name="gui" value="$(arg gui)"/>
@@ -23,7 +23,7 @@
     <arg name="verbose" value="$(arg verbose)"/>
   </include>
 
-  <include file="$(find cobotta_launch)/launch/cobotta.launch" >
+  <include file="$(find bringup_launch)/launch/cobotta.launch" >
     <arg name="robot_name" value="robot_1" />
     <arg name="gripper_type" default="parallel"/>
     <arg name="init_x" value="0.3" />
@@ -33,7 +33,7 @@
     <arg name="init_P" value="0" />
     <arg name="init_Y" value="$(eval 225.0 / 180.0 *3.1415 )" />
   </include>
-  <include file="$(find cobotta_launch)/launch/cobotta.launch" >
+  <include file="$(find bringup_launch)/launch/cobotta.launch" >
     <arg name="robot_name" value="robot_2" />
     <arg name="gripper_type" default="parallel"/>
     <arg name="init_x" value="0.3" />
