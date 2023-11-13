@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Originally copied from 'denso_cobotta_ros/denso_cobotta_bringup/lauch/denso_cobotta_bringup.launch'. -->
+<launch>
+  <arg name="robot_name" default="robot" />
+  <arg name="gripper_type" default="parallel"/>
+  <param name="gripper_type" value="$(arg gripper_type)"/>
+
+  <!-- "gripper type": Select from none/parallel/vacuum. -->
+
+  <!-- Load the robot_description parameter before launching ROS-I nodes. -->
+   <param name="cobotta/robot_description" command="$(find xacro)/xacro --inorder $(find denso_cobotta_descriptions)/cobotta_description/cobotta.urdf.xacro gripper_type:=$(arg gripper_type) robot_description:=$(arg robot_name)/cobotta/robot_description robot_name:=$(arg robot_name)/cobotta"/>
+  
+  
+  <group ns="$(arg robot_name)/cobotta" >
+    <include file="$(find denso_cobotta_moveit_config)/launch/planning_context.launch">
+      <arg name="load_robot_description" value="false" />
+      <arg name="gripper_type" value="$(arg gripper_type)"/>
+    </include>
+
+    <!-- Include files for MoveIt! -->
+    <include file="$(find denso_cobotta_moveit_config)/launch/move_group.launch">
+      <arg name="publish_monitored_planning_scene" value="true" />
+      <arg name="gripper_type" value="$(arg gripper_type)"/>
+    </include>
+  </group>
+</launch>

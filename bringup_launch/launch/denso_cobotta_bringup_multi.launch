@@ -34,7 +34,7 @@
 
         <group if="$(eval arg('gripper_type') != 'none')">
             <rosparam command="load" ns="cobotta" file="$(find denso_cobotta_gripper)/config/gripper_$(arg gripper_type).yaml" />
-                    <!-- node -->
+            <!-- node -->
             <node ns="cobotta" name="denso_cobotta_gripper" pkg="denso_cobotta_gripper" type="denso_cobotta_gripper" output="screen" required="true">
                 <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}]: ${node}: ${message}"/>
             </node>
